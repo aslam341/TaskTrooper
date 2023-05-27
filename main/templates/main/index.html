@@ -1,10 +1,15 @@
 {% extends "main/layout.html" %}
+{% load static %}
+
+{% block title %}
+  TaskTrooper
+{% endblock %}
 
 {% block body %}
   <!-- Navbar -->
   <nav class="navbar navbar-expand-md navbar-dark bg-dark-blue-1 py-3 fixed-top">
     <div class="container">
-      <a class="navbar-brand" href="#"><span class="text-warning">
+      <a class="navbar-brand" href="{% url 'main:home' %}"><span class="text-warning">
         TaskTrooper
       </span></a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navmenu" aria-expanded="false" aria-label="Toggle navigation">
@@ -12,18 +17,27 @@
       </button>
       <div class="collapse navbar-collapse" id="navmenu">
         <ul class="navbar-nav ms-auto align-items-center justify-content-between">
-          <li class="nav-item">
-            <a href="#about" class="nav-link">About</a>
-          </li>
-          <li class="nav-item">
-            <a href="#contactus" class="nav-link">Contact Us</a>
-          </li>
-          <li class="nav-item">
-            <a href="#signup" class="nav-link">Sign Up</a>
-          </li>
-          <li class="nav-item">
-            <a href="#login" class="nav-link"><span class="btn btn-primary btn-sm">Login</span></a>
-          </li>
+          {% if user.is_authenticated %}
+            <li class="nav-item">
+              <span class="text-warning">Hi, {{ user.username }}!</span>
+            </li>
+            <li class="nav-item">
+              <a href="{% url 'logout' %}" class="nav-link"><span class="btn btn-primary btn-sm">Logout</span></a>
+            </li>
+          {% else %}
+            <li class="nav-item">
+              <a href="#about" class="nav-link">About</a>
+            </li>
+            <li class="nav-item">
+              <a href="#contactus" class="nav-link">Contact Us</a>
+            </li>
+            <li class="nav-item">
+              <a href="{% url 'account:signup' %}" class="nav-link">Sign Up</a>
+            </li>
+            <li class="nav-item">
+              <a href="{% url 'login' %}" class="nav-link"><span class="btn btn-primary btn-sm">Login</span></a>
+            </li>
+          {% endif %}
         </ul>
       </div>
     </div>
@@ -41,9 +55,14 @@
           <p class="lead">
             A simple project management app
           </p>
-          <button class="btn btn-primary btn-lg">
-            Sign Up Now!
-          </button>
+          <a href="{% url 'account:signup' %}">
+            {% if not user.is_authenticated %}
+              <button class="btn btn-primary btn-lg">
+                Sign Up Now!
+              </button>
+            {% else %}
+            {% endif %}
+          </a>
         </div>
         <img class="img-fluid w-50 d-none d-sm-block" src="{% static 'main/img/undraw_scrum_board_re_wk7v.svg' %}" alt="Task Trooper Logo">
       </div>
