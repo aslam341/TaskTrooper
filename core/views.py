@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
 
 from .models import Project, Task
-from .forms import AddTaskForm, AddProjectForm
+from .forms import AddTaskForm, AddProjectForm, ChangeTaskStatusForm
 
 # Create your views here.
 def index(request):
@@ -92,6 +92,21 @@ def taskproperties(request, project_id, task_id):
     return render(request, "core/taskproperties.html", {
         "project": project,
         "task": task
+    })
+
+def changetaskstatus(request, project_id, task_id):
+    task = Task.objects.get(id=task_id)
+    if request.method == "POST":
+        form = ChangeTaskStatusForm(request.POST, instance=task)
+        if form.is_valid():
+            form.save()
+            return redirect(reverse("core:project", args=(project_id,)))
+    else:
+        form = ChangeTaskStatusForm(instance=task)
+
+    return render(request, "core/changetaskstatus.html", {
+        "form":form,
+        "task":task
     })
 
 def deletetask(request, project_id, task_id):

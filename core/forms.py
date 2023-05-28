@@ -18,3 +18,10 @@ class AddTaskForm(forms.ModelForm):
         model = Task
         fields = '__all__'
 
+class ChangeTaskStatusForm(forms.ModelForm):
+    class Meta:
+        model = Task
+        fields = ['status']
+        widgets = {
+            'status': forms.Select(attrs={'class': 'form-control'}),
+        }
