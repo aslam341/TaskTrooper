@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
 
 from .models import Project, Task
@@ -38,7 +38,9 @@ def addproject(request):
     if request.method == "POST":
         form = AddProjectForm(request.POST)
         if form.is_valid():
-            task = form.save()
+            project = form.save(commit=False)
+            project.user = user
+            project.save()
             return redirect(reverse("core:myprojects"))
 
     else:
@@ -48,21 +50,62 @@ def addproject(request):
         "form":form,
     })
 
+def deleteproject(request, project_id):
+    if not request.user.is_authenticated:
+        return redirect(reverse("main:home"))
+
+    project = get_object_or_404(Project, id=project_id)
+
+    if request.method == "POST":
+        project.delete_project()
+        return redirect(reverse("core:myprojects"))
+    
+    return render(request, "core/deleteproject.html", {
+        "project":project
+    })
+
 def addtask(request, project_id):
     if not request.user.is_authenticated:
         return redirect(reverse("main:home"))
 
     project = Project.objects.get(id=project_id)
     if request.method == "POST":
-        form = AddTaskForm(request.POST)
+        form = AddTaskForm(project_id, request.POST)
         if form.is_valid():
             task = form.save()
             return redirect(reverse("core:project", args=(project.id,)))
 
     else:
-        form = AddTaskForm()
+        form = AddTaskForm(project_id)
 
     return render(request, "core/addtask.html", {
         "form":form,
         "project":project
+    })
+
+def taskproperties(request, project_id, task_id):
+    if not request.user.is_authenticated:
+        return redirect(reverse("main:home"))
+
+    project = Project.objects.get(id=project_id)
+    task = Task.objects.get(id=task_id)
+    return render(request, "core/taskproperties.html", {
+        "project": project,
+        "task": task
+    })
+
+def deletetask(request, project_id, task_id):
+    if not request.user.is_authenticated:
+        return redirect(reverse("main:home"))
+
+    project = get_object_or_404(Project, id=project_id)
+    task = get_object_or_404(Task, id=task_id)
+
+    if request.method == "POST":
+        task.delete_task()
+        return redirect(reverse("core:project", args=(project.id,)))
+    
+    return render(request, "core/deletetask.html", {
+        "project":project,
+        "task":task
     })

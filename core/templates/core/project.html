@@ -39,17 +39,44 @@
   <section class="bg-dark-blue-2 text-light text-center p-5 p-lg-0 pt-lg-5" style="height: 100vh;">
     <div class="container pb-3">
         <h1 class="display-4 fw-bold">Your Tasks</h1>
+        <a href="{% url 'core:deleteproject' project.id %}" class="nav-link"><span class="btn btn-danger btn-sm">Delete Project?</span></a>
+        <div class="text-start">
+          <p>Click on the task's name to view it's description.</p>
+        </div>
     </div>
     <div class="container">
-      <ul class="list-unstyled text-center">
-        {% for task in tasks %}
-            <li>{{ task.name }}: Due on {{ task.end_datetime }}</li>
-        {% empty %}
-          <p>No tasks yet</p>
-        {% endfor %}
-      </ul>
+      <table class="table text-light" data-toggle="table">
+        {% if tasks %}
+          <thead>
+            <tr>
+              <th scope="col">id</th>
+              <th scope="col">Name of Task</th>
+              <th data-sortable="true" scope="col">Start Date & Time</th>
+              <th data-sortable="true" scope="col">End Date & Time</th>
+              <th data-sortable="true" scope="col">Status</th>
+              <th scope="col">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for task in tasks %}
+              <tr>
+                <td>{{ forloop.counter }}</td>
+                <td><a href="{% url 'core:taskproperties' project.id task.id %}" class="nav-link">{{ task.name }}</a></td>
+                <td>{{ task.start_datetime }}</td>
+                <td>{{ task.end_datetime }}</td>
+                <td>{{ task.status }}</td>
+                <td><a href="{% url 'core:deletetask' project.id task.id %}" class="nav-link"><span class="btn btn-danger btn-sm">Delete</span></a></td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        {% else %}
+          <tr>
+            <td colspan="6">No tasks found.</td>
+          </tr>
+        {% endif %}
+      </table>
     </div>
-    <div>
+    <div class="pt-5">
       <a href="{% url 'core:addtask' project.id %}" class="btn btn-success btn-sm">
         <span class="fw-bold">
           + Add Task

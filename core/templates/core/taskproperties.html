@@ -2,13 +2,10 @@
 {% load static %}
 
 {% block title %}
-  My Projects
+  TaskTrooper
 {% endblock %}
 
-{% load crispy_forms_tags %}
-
 {% block body %}
-<!-- Navbar -->
   <nav class="navbar navbar-expand-md navbar-dark bg-dark-blue-1 py-3 fixed-top">
     <div class="container">
       <a class="navbar-brand" href="{% url 'core:home' %}">
@@ -38,29 +35,15 @@
     </div>
   </nav>
 
-  <section class="bg-dark-blue-2 text-light text-center p-5 p-lg-0 pt-lg-5" style="height: 100vh;">
-    <div class="container pb-3">
-        <h1 class="display-4 fw-bold">Your Projects</h1>
-    </div>
-    <div class="container">
-    {% for project in projects %}
-      <div class="p-1">
-        <a href="{% url 'core:project' project.id %}" class="btn btn-info btn-sm">
-          <span class="fw-bold">
-            {{ project.name }}
-          </span>
-        </a>
-      </div>
-    {% empty %}
-      <p>No projects yet</p>
-    {% endfor %}
-    </div>
-    <div class="pt-3">
-      <a href="{% url 'core:addproject' %}" class="btn btn-success btn-sm">
-        <span class="fw-bold">
-          + Add Project
-        </span>
-      </a>
-    </div>
-  </section>
+    <section class="bg-dark-blue-2 text-light text-center text-sm-start p-5 p- pt-lg-5" style="height: 100vh;">
+      <div class="container">
+        <div class="align-items-center justify-content-between">
+          <p> Task Name: {{ task.name }}</p>
+          <p> Task Description: {{ task.description }}</p>
+          <p> Task Start Date and Time: {{ task.start_datetime }}</p>
+          <p> Task End Date and Time: {{ task.end_datetime }}</p>
+          <p> Task Status: {{ task.status }}</p>
+        </div>
+      </div> 
+    </section>
 {% endblock %}

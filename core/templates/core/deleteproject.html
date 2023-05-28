@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block title %}
-  My Projects
+    {{ project.name }}
 {% endblock %}
 
 {% load crispy_forms_tags %}
@@ -38,29 +38,14 @@
     </div>
   </nav>
 
-  <section class="bg-dark-blue-2 text-light text-center p-5 p-lg-0 pt-lg-5" style="height: 100vh;">
-    <div class="container pb-3">
-        <h1 class="display-4 fw-bold">Your Projects</h1>
-    </div>
-    <div class="container">
-    {% for project in projects %}
-      <div class="p-1">
-        <a href="{% url 'core:project' project.id %}" class="btn btn-info btn-sm">
-          <span class="fw-bold">
-            {{ project.name }}
-          </span>
-        </a>
-      </div>
-    {% empty %}
-      <p>No projects yet</p>
-    {% endfor %}
-    </div>
-    <div class="pt-3">
-      <a href="{% url 'core:addproject' %}" class="btn btn-success btn-sm">
-        <span class="fw-bold">
-          + Add Project
-        </span>
-      </a>
+  <section class="bg-dark-blue-2 text-light text-center text-sm-start p-5 p-lg-0 pt-lg-5" style="height: 100vh;">
+    <div class="container py-5">
+      <form method="post">
+        {% csrf_token %}
+        {{ form|crispy }}
+        <p>Are you sure you want to delete the project "{{ project.name }}"?</p>
+        <button type="submit" class="btn btn-danger">Delete</button>
+      </form>
     </div>
   </section>
 {% endblock %}
