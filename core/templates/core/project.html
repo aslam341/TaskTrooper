@@ -1,0 +1,60 @@
+{% extends "main/layout.html" %}
+{% load static %}
+
+{% block title %}
+  {{ project.name }} 
+{% endblock %}
+
+{% block body %}
+<!-- Navbar -->
+  <nav class="navbar navbar-expand-md navbar-dark bg-dark-blue-1 py-3 fixed-top">
+    <div class="container">
+      <a class="navbar-brand" href="{% url 'core:home' %}">
+        <span class="text-warning">
+        TaskTrooper
+        </span>
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navmenu" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon">
+        </span>
+      </button>
+      <div class="collapse navbar-collapse" id="navmenu">
+        <ul class="navbar-nav justify-content-start">
+          <li class="nav-item">
+            <a href="{% url 'core:myprojects' %}" class="nav-link">View Projects</a>
+          </li>
+        </ul>
+        <ul class="navbar-nav ms-auto align-items-center justify-content-between">
+          <li class="nav-item">
+            <span class="text-warning">Hi, {{ user.first_name }}!</span>
+          </li>
+          <li class="nav-item">
+            <a href="{% url 'logout' %}" class="nav-link"><span class="btn btn-primary btn-sm">Logout</span></a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <section class="bg-dark-blue-2 text-light text-center p-5 p-lg-0 pt-lg-5" style="height: 100vh;">
+    <div class="container pb-3">
+        <h1 class="display-4 fw-bold">Your Tasks</h1>
+    </div>
+    <div class="container">
+      <ul class="list-unstyled text-center">
+        {% for task in tasks %}
+            <li>{{ task.name }}: Due on {{ task.end_datetime }}</li>
+        {% empty %}
+          <p>No tasks yet</p>
+        {% endfor %}
+      </ul>
+    </div>
+    <div>
+      <a href="{% url 'core:addtask' project.id %}" class="btn btn-success btn-sm">
+        <span class="fw-bold">
+          + Add Task
+        </span>
+      </a>
+    </div>
+  </section>
+{% endblock %}
