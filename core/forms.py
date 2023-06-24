@@ -137,11 +137,39 @@ class ChangeTaskStatusForm(forms.ModelForm):
 class ModifyTaskForm(forms.ModelForm):
     class Meta:
         model = Task
-        exclude = ['project']
+        fields = ['name', 'description', 'start_datetime', 'end_datetime', 'status', 'users']
         widgets = {
             'name': forms.TextInput(attrs={'class': 'form-control', 'autocomplete': 'off'}),
-            'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 4}),
-            'start_datetime': forms.DateTimeInput(attrs={'class': 'form-control', 'autocomplete': 'off'}),
-            'end_datetime': forms.DateTimeInput(attrs={'class': 'form-control', 'autocomplete': 'off'}),
+            'description': forms.Textarea(attrs={'class': 'form-control', 'autocomplete': 'off'}),
+            'start_datetime': DateTimePickerInput(
+                options={
+                    "format": "DD-MM-YYYY HH:mm",
+                    "useCurrent": False,
+                    "showClose": True,
+                    "showClear": True,
+                    "showTodayButton": True,
+                    "allowInputToggle": True,
+                },
+                attrs={
+                    'class': 'datepicker form-control',
+                    'autocomplete': 'off'
+                },
+            ),
+            'end_datetime': DateTimePickerInput(
+                range_from="start_datetime",
+                options={
+                    "format": "DD-MM-YYYY HH:mm",
+                    "useCurrent": False,
+                    "showClose": True,
+                    "showClear": True,
+                    "showTodayButton": True,
+                    "allowInputToggle": True,
+                },
+                attrs={
+                    'class': 'datepicker form-control',
+                    'autocomplete': 'off'
+                },
+            ),
             'status': forms.Select(attrs={'class': 'form-control', 'autocomplete': 'off'}),
+            'users': forms.CheckboxSelectMultiple(),
         }

@@ -1,4 +1,7 @@
 {% extends "main/layout.html" %}
+
+{% load permissions_tags %}
+
 {% load static %}
 
 {% block title %}
@@ -11,7 +14,7 @@
   <!-- Marked: Move javascript to different file -->
   <script>
     function copyInviteLink() {
-      const inviteLinkInput = document.getElementById("invite_link");
+      const inviteLinkInput = document.getElementById("invite_code");
       const inviteCode = inviteLinkInput.value;
   
       // Construct the formatted invite link
@@ -34,8 +37,19 @@
 
 {% block body %}
 
+  <!-- Loads and stores the permissions the user has -->
+  {% has_permission user "read" project.id as user_has_read_permission %}
+  {% has_permission user "add_users" project.id as user_has_add_users_permission %}
+  {% has_permission user "create_tasks" project.id as user_has_create_tasks_permission %}
+  {% has_permission user "modify_tasks" project.id as user_has_modify_tasks_permission %}
+  {% has_permission user "delete_tasks" project.id as user_has_delete_tasks_permission %}
+  {% has_permission user "modify_other_users_permissions" project.id as user_has_modify_other_users_permissions %}
+  {% has_permission user "delete_users" project.id as user_has_delete_users_permission %}
+  {% has_permission user "delete_project" project.id as user_has_delete_project_permission %}
+  {% has_permission user "creator" project.id as user_has_creator_permission %}
+
   {% include "core/navbarlayout.html" %}
-  {% include "core/sidebarlayout.html" %}
+  {% include "core/sidebarlayout.html" with user_has_modify_other_users_permissions=user_has_modify_other_users_permissions user_has_delete_project_permission=user_has_delete_project_permission %}
 
   <section class="bg-dark-blue-2 text-light text-center p-5 p-lg-0 pt-lg-5" style="height: 100vh;">
     <div class="container pb-3">
@@ -51,6 +65,7 @@
             <tr>
               <th scope="col">id</th>
               <th scope="col">Name of Task</th>
+              <th scope="col">Assigned Users</th>
               <th data-sortable="true" scope="col">Start Date & Time</th>
               <th data-sortable="true" scope="col">End Date & Time</th>
               <th data-sortable="true" scope="col">Status</th>
@@ -62,12 +77,18 @@
               <tr>
                 <td>{{ forloop.counter }}</td>
                 <td><a href="{% url 'core:taskproperties' project.id task.id %}" class="nav-link">{{ task.name }}</a></td>
+                <td>
+                  {% for user in task.users.all %}
+                    <div>{{ user.username }}</div>
+                  {% endfor %}
+                </td>
                 <td>{{ task.start_datetime }}</td>
                 <td>{{ task.end_datetime }}</td>
                 <td>{{ task.status }}</td>
                 <td>
                   <a href="{% url 'core:deletetask' project.id task.id %}" class="nav-link p-1"><span class="btn btn-danger btn-sm">Delete</span></a>
                   <a href="{% url 'core:changetaskstatus' project.id task.id %}" class="nav-link p-1"><span class="btn btn-info btn-sm">Change Status</span></a>
+                  <a href="{% url 'core:modifytask' project.id task.id %}" class="nav-link p-1"><span class="btn btn-info btn-sm">Modify Task</span></a>
                 </td>
               </tr>
             {% endfor %}
@@ -88,10 +109,11 @@
     </div>
     <form>
       <div class="form-group pt-5">
-          <label for="invite_link">Invite Code:</label>
-          <input type="text" id="invite_link" name="invite_link" value="{{ project.invite_link }}" readonly>
+          <label for="invite_code">Invite Code:</label>
+          <input type="text" id="invite_code" name="invite_code" value="{{ project.invite_code }}" readonly>
       </div>
       <button type="submit" class="btn btn-info btn-sm" onclick="copyInviteLink()">Copy Invite Link</button>
     </form>
+
   </section>
 {% endblock %}

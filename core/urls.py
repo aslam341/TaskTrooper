@@ -17,5 +17,6 @@ urlpatterns = [
     path('myprojects/<int:project_id>/addtask', views.addtask, name='addtask'), # Add a task
     path('myprojects/<int:project_id>/<int:task_id>/', views.taskproperties, name='taskproperties'), # Overview of a task
     path('myprojects/<int:project_id>/<int:task_id>/deletetask', views.deletetask, name='deletetask'), # Delete a task
-    path('myprojects/<int:project_id>/<int:task_id>/changetaskstatus', views.changetaskstatus, name='changetaskstatus') # Change a task's status
+    path('myprojects/<int:project_id>/<int:task_id>/changetaskstatus', views.changetaskstatus, name='changetaskstatus'), # Change a task's status
+    path('myprojects/<int:project_id>/<int:task_id>/modifytask', views.modifytask, name='modifytask') # Change a task's status
 ]

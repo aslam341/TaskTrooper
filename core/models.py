@@ -8,7 +8,7 @@ class Project(models.Model):
     name = models.CharField(max_length=100)
     creator = models.ForeignKey(User, on_delete=models.CASCADE, related_name="created_projects", editable=False, null=True)
 
-    invite_link = models.CharField(max_length=7, blank=True, null=True)
+    invite_code = models.CharField(max_length=7, blank=True, null=True)
     users = models.ManyToManyField(User, through='ProjectPermission', related_name="joined_projects")
 
     def delete_project(self):
@@ -40,8 +40,8 @@ class Project(models.Model):
     def save(self, *args, **kwargs):
         is_new_project = self.pk is None  # Check if it's a new project being created
         if is_new_project:
-            if not self.invite_link:
-                self.invite_link = str(uuid.uuid4())[:7]
+            if not self.invite_code:
+                self.invite_code = str(uuid.uuid4())[:7]
             super().save(*args, **kwargs)  # Save the project instance first
 
             # Create ProjectPermission for the creator with 'creator' permission

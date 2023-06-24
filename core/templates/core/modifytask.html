@@ -5,7 +5,7 @@
 {% load static %}
 
 {% block title %}
-  {{ project.name }}
+  {{ project.name }} 
 {% endblock %}
 
 {% block head %}
@@ -31,12 +31,13 @@
   {% include "core/sidebarlayout.html" with user_has_modify_other_users_permissions=user_has_modify_other_users_permissions user_has_delete_project_permission=user_has_delete_project_permission %}
 
   <section class="bg-dark-blue-2 text-light text-center text-sm-start p-5 p-lg-0 pt-lg-5" style="height: 100vh;">
-    <div class="container py-5">
+    <div class="container pb-3">
+      <h1>Modify Task</h1>
       <form method="post">
         {% csrf_token %}
         {{ form.media }}
         {{ form | crispy }}
-        <button type="submit" class="btn btn-success">Add Task</button>
+        <button type="submit">Save Changes</button>
       </form>
     </div>
   </section>

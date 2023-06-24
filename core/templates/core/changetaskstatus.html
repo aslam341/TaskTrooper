@@ -1,49 +1,38 @@
 {% extends "main/layout.html" %}
+{% load permissions_tags %}
 {% load static %}
 
 {% block title %}
     {{ project.name }}
 {% endblock %}
 
+{% block head %}
+  <link rel="stylesheet" type="text/css" href="{% static 'core/styles.css' %}">
+{% endblock %}
+
 {% load crispy_forms_tags %}
 
 {% block body %}
-<!-- Navbar -->
-  <nav class="navbar navbar-expand-md navbar-dark bg-dark-blue-1 py-3 fixed-top">
-    <div class="container">
-      <a class="navbar-brand" href="{% url 'core:home' %}">
-        <span class="text-warning">
-        TaskTrooper
-        </span>
-      </a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navmenu" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon">
-        </span>
-      </button>
-      <div class="collapse navbar-collapse" id="navmenu">
-        <ul class="navbar-nav justify-content-start">
-          <li class="nav-item">
-            <a href="{% url 'core:myprojects' %}" class="nav-link">View Projects</a>
-          </li>
-        </ul>
-        <ul class="navbar-nav ms-auto align-items-center justify-content-between">
-          <li class="nav-item">
-            <span class="text-warning">Hi, {{ user.first_name }}!</span>
-          </li>
-          <li class="nav-item">
-            <a href="{% url 'logout' %}" class="nav-link"><span class="btn btn-primary btn-sm">Logout</span></a>
-          </li>
-        </ul>
-      </div>
-    </div>
-  </nav>
+  <!-- Loads and stores the permissions the user has -->
+  {% has_permission user "read" project.id as user_has_read_permission %}
+  {% has_permission user "add_users" project.id as user_has_add_users_permission %}
+  {% has_permission user "create_tasks" project.id as user_has_create_tasks_permission %}
+  {% has_permission user "modify_tasks" project.id as user_has_modify_tasks_permission %}
+  {% has_permission user "delete_tasks" project.id as user_has_delete_tasks_permission %}
+  {% has_permission user "modify_other_users_permissions" project.id as user_has_modify_other_users_permissions %}
+  {% has_permission user "delete_users" project.id as user_has_delete_users_permission %}
+  {% has_permission user "delete_project" project.id as user_has_delete_project_permission %}
+  {% has_permission user "creator" project.id as user_has_creator_permission %}
+
+  {% include "core/navbarlayout.html" %}
+  {% include "core/sidebarlayout.html" with user_has_modify_other_users_permissions=user_has_modify_other_users_permissions user_has_delete_project_permission=user_has_delete_project_permission %}
 
   <section class="bg-dark-blue-2 text-light text-center text-sm-start p-5 p-lg-0 pt-lg-5" style="height: 100vh;">
     <div class="container py-5">
       <p>Task Name: {{ task.name }}</p>
       <form method="post">
         {% csrf_token %}
-        {{ form|crispy }}
+        {{ form | crispy }}
         <button type="submit" class="btn btn-primary">Update Status</button>
       </form>
     </div>

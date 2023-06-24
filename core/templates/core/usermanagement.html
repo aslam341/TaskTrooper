@@ -1,4 +1,5 @@
 {% extends "main/layout.html" %}
+{% load permissions_tags %}
 {% load static %}
 
 {% block title %}
@@ -11,8 +12,19 @@
 
 {% block body %}
 
+  <!-- Loads and stores the permissions the user has -->
+  {% has_permission user "read" project.id as user_has_read_permission %}
+  {% has_permission user "add_users" project.id as user_has_add_users_permission %}
+  {% has_permission user "create_tasks" project.id as user_has_create_tasks_permission %}
+  {% has_permission user "modify_tasks" project.id as user_has_modify_tasks_permission %}
+  {% has_permission user "delete_tasks" project.id as user_has_delete_tasks_permission %}
+  {% has_permission user "modify_other_users_permissions" project.id as user_has_modify_other_users_permissions %}
+  {% has_permission user "delete_users" project.id as user_has_delete_users_permission %}
+  {% has_permission user "delete_project" project.id as user_has_delete_project_permission %}
+  {% has_permission user "creator" project.id as user_has_creator_permission %}
+
   {% include "core/navbarlayout.html" %}
-  {% include "core/sidebarlayout.html" %}
+  {% include "core/sidebarlayout.html" with user_has_modify_other_users_permissions=user_has_modify_other_users_permissions user_has_delete_project_permission=user_has_delete_project_permission %}
 
   <section class="bg-dark-blue-2 text-light text-center p-5 p-lg-0 pt-lg-5">
     <div class="container pb-3">

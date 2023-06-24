@@ -39,7 +39,14 @@
       <div class="container">
         <div class="align-items-center justify-content-between">
           <p> Task Name: {{ task.name }}</p>
-          <p> Task Description: {{ task.description }}</p>
+          <p> Task Users: 
+            {% for user in task.users.all %}
+              {{ user.username }}
+              {% if not forloop.last %},{% endif %}
+            {% endfor %}
+          </p>
+          <p> Task Description:</p>
+          <p class="pb-5"> &nbsp;&nbsp;&nbsp;&nbsp; {{ task.description }}</p>
           <p> Task Start Date and Time: {{ task.start_datetime }}</p>
           <p> Task End Date and Time: {{ task.end_datetime }}</p>
           <p> Task Status: {{ task.status }}</p>
