@@ -18,7 +18,6 @@ class BulkModifyPermissionForm(forms.Form):
             project=project,
             user=request.user
         ).first().permission
-        print(current_user_permission)  
 
         users = project.users.exclude(
             id=request.user.id
@@ -42,6 +41,35 @@ class BulkModifyPermissionForm(forms.Form):
         ]
         self.fields['new_permission'].choices = permission_choices
 
+class BulkRemoveUserForm(forms.Form):
+    selected_users = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple)
+
+    def __init__(self, *args, **kwargs):
+        project = kwargs.pop('project')
+        request = kwargs.pop('request')
+        super().__init__(*args, **kwargs)
+
+        current_user_permission = ProjectPermission.objects.filter(
+            project=project,
+            user=request.user
+        ).first().permission
+
+        users = project.users.exclude(
+            id=request.user.id
+        ).exclude(
+            id=project.creator.id
+        )
+
+        filtered_users = []
+        for user in users:
+            user_permission = ProjectPermission.PERMISSION_LEVELS.get(
+                project.permissions.filter(user=user).first().permission
+            )
+            if user_permission is not None and user_permission < ProjectPermission.PERMISSION_LEVELS.get(current_user_permission):
+                filtered_users.append((user.id, user.username))
+
+        self.fields['selected_users'].choices = filtered_users
+
 class AddProjectForm(forms.ModelForm):
     class Meta:
         model = Project
@@ -52,10 +80,12 @@ class AddProjectForm(forms.ModelForm):
 
 class AddTaskForm(forms.ModelForm):
     def __init__(self, project_id, *args, **kwargs):
+        project = Project.objects.get(id=project_id)
         super(AddTaskForm, self).__init__(*args, **kwargs)
         self.fields['project'].queryset = Project.objects.filter(id=project_id) # For security reason, this line prevents users from seeing other users' projects
         self.fields['project'].initial = project_id
         self.fields['project'].disabled = True
+        self.fields['users'].queryset = project.users.all()
 
     class Meta:
         model = Task
@@ -93,6 +123,7 @@ class AddTaskForm(forms.ModelForm):
                 },
             ),
             'status': forms.Select(attrs={'class': 'form-control', 'autocomplete': 'off'}),
+            'users': forms.CheckboxSelectMultiple(),
         }
 
 class ChangeTaskStatusForm(forms.ModelForm):

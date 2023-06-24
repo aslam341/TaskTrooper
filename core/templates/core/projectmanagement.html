@@ -1,0 +1,38 @@
+{% extends "main/layout.html" %}
+{% load static %}
+
+{% block title %}
+  {{ project.name }} 
+{% endblock %}
+
+{% block head %}
+  <link rel="stylesheet" type="text/css" href="{% static 'core/styles.css' %}">
+{% endblock %}
+
+{% block body %}
+  
+  {% include "core/navbarlayout.html" %}
+  {% include "core/sidebarlayout.html" %}
+
+  <section class="bg-dark-blue-2 text-light text-center p-5 p-lg-0 pt-lg-5">
+    <div class="container pb-3">
+      <h1>Project Management</h1>
+    </div>
+  </section>
+
+  <section class="bg-dark-blue-2 text-light text-center p-5 p-lg-0 pt-lg-5" style="height: 100vh;">
+    <div class="container pb-3">
+        <form method="POST" action="{% url 'core:updateprojectname' project.id %}">
+            {% csrf_token %}
+            <label for="id_project_name">Project Name:</label>
+            <input type="text" name="project_name" id="id_project_name" value="{{ project.name }}">
+            <button type="submit">Update Project Name</button>
+        </form>
+    </div>
+    <div class="container pt-3 pb-3">
+      <a href="{% url 'core:deleteproject' project.id %}" class="nav-link"><span class="btn btn-danger btn-sm">Delete Project?</span></a>
+    </div>
+  </section>
+
+  
+{% endblock %}

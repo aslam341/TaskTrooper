@@ -27,6 +27,10 @@ class Project(models.Model):
                 project_permission.permission = 'read'
                 project_permission.save()
 
+    def removeUser(self, user):
+        self.users.remove(user)
+        ProjectPermission.objects.filter(project=self, user=user).delete()
+
     def updatePermission(self, user, new_permission):
         project_permission = ProjectPermission.objects.filter(project=self, user=user).first()
         if project_permission:
@@ -109,6 +113,7 @@ class Task(models.Model):
     end_datetime = models.DateTimeField()
 
     status = models.CharField(max_length=20, choices=STATUS_CHOICES)
+    users = models.ManyToManyField(User, related_name='tasks')
 
     def delete_task(self):
         self.delete()
