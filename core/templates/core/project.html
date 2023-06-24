@@ -5,6 +5,10 @@
   {{ project.name }} 
 {% endblock %}
 
+{% block head %}
+  <link rel="stylesheet" type="text/css" href="{% static 'core/styles.css' %}">
+{% endblock %}
+
 {% block body %}
 <!-- Navbar -->
   <nav class="navbar navbar-expand-md navbar-dark bg-dark-blue-1 py-3 fixed-top">
@@ -35,6 +39,16 @@
       </div>
     </div>
   </nav>
+
+  <div class="sidebar">
+    <a href="#">Profile</a>
+    {% if user_has_modify_other_users_permissions %}
+      <a href="{% url 'core:bulk_modify_permission' project.id %}">User Management</a>
+    {% endif %}
+    {% if user_has_delete_project_permission %}
+      <a href="#">Project Management</a>
+    {% endif %}
+  </div>
 
   <section class="bg-dark-blue-2 text-light text-center p-5 p-lg-0 pt-lg-5" style="height: 100vh;">
     <div class="container pb-3">
@@ -86,5 +100,12 @@
         </span>
       </a>
     </div>
+    <form>
+      <div class="form-group">
+          <label for="invite_link">Invite Link:</label>
+          <input type="text" id="invite_link" name="invite_link" value="{{ project.invite_link }}" readonly>
+      </div>
+      <button type="submit">Save</button>
+  </form>
   </section>
 {% endblock %}

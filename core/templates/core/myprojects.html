@@ -7,6 +7,10 @@
 
 {% load crispy_forms_tags %}
 
+{% block head %}
+  <link rel="stylesheet" type="text/css" href="{% static 'core/styles.css' %}">
+{% endblock %}
+
 {% block body %}
 <!-- Navbar -->
   <nav class="navbar navbar-expand-md navbar-dark bg-dark-blue-1 py-3 fixed-top">
@@ -40,20 +44,37 @@
 
   <section class="bg-dark-blue-2 text-light text-center p-5 p-lg-0 pt-lg-5" style="height: 100vh;">
     <div class="container pb-3">
-        <h1 class="display-4 fw-bold">Your Projects</h1>
+      <h1 class="display-4 fw-bold">Your Projects</h1>
     </div>
+    <!-- Created Projects -->
     <div class="container">
-    {% for project in projects %}
-      <div class="p-1">
-        <a href="{% url 'core:project' project.id %}" class="btn btn-info btn-sm">
-          <span class="fw-bold">
-            {{ project.name }}
-          </span>
-        </a>
-      </div>
-    {% empty %}
-      <p>No projects yet</p>
-    {% endfor %}
+      <p>Projects created by you:</p>
+      {% for project in created_projects %}
+        <div class="p-1">
+          <a href="{% url 'core:project' project.id %}" class="btn btn-info btn-sm">
+            <span class="fw-bold">
+              {{ project.name }}
+            </span>
+          </a>
+        </div>
+      {% empty %}
+        <p>No projects created</p>
+      {% endfor %}
+    </div>
+    <!-- Joined Projects -->
+    <div class="container">
+      <p>Projects you joined:</p>
+      {% for project in joined_projects %}
+        <div class="p-1">
+          <a href="{% url 'core:project' project.id %}" class="btn btn-info btn-sm">
+            <span class="fw-bold">
+              {{ project.name }}
+            </span>
+          </a>
+        </div>
+      {% empty %}
+        <p>No projects joined</p>
+      {% endfor %}
     </div>
     <div class="pt-3">
       <a href="{% url 'core:addproject' %}" class="btn btn-success btn-lg">

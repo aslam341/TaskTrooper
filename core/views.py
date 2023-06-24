@@ -1,8 +1,11 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
+from django.contrib import messages
+from django.contrib.auth.models import User
+from django.db.models import Q, F
 
-from .models import Project, Task
-from .forms import AddTaskForm, AddProjectForm, ChangeTaskStatusForm
+from .models import Project, Task, ProjectPermission
+from .forms import AddTaskForm, AddProjectForm, ChangeTaskStatusForm, BulkModifyPermissionForm
 
 # Create your views here.
 def index(request):
@@ -15,8 +18,12 @@ def myprojects(request):
     if not request.user.is_authenticated:
         return redirect(reverse("main:home"))
 
+    created_projects = request.user.created_projects.all()
+    joined_projects = request.user.joined_projects.exclude(creator=request.user)
+
     return render(request, "core/myprojects.html", {
-        "projects": request.user.projects.all()
+        "created_projects": created_projects,
+        "joined_projects": joined_projects
     })
 
 def project(request, project_id):
@@ -25,21 +32,31 @@ def project(request, project_id):
 
     project = Project.objects.get(id=project_id)
     tasks = project.tasks.all()
+    # Check if the user has the 'modify_other_users_permissions' permission
+    user_has_modify_other_users_permissions = False
+    user_has_delete_project_permission = False
+    project_permission = ProjectPermission.objects.filter(project=project, user=request.user).first()
+    if project_permission:
+        user_has_modify_other_users_permissions = project_permission.has_permission('modify_other_users_permissions')
+        user_has_delete_project_permission = project_permission.has_permission('delete_project')
+
     return render(request, "core/project.html", {
         "project": project,
-        "tasks": tasks
+        "tasks": tasks,
+        "user_has_modify_other_users_permissions": user_has_modify_other_users_permissions,
+        "user_has_delete_project_permission": user_has_delete_project_permission
     })
 
 def addproject(request):
     if not request.user.is_authenticated:
         return redirect(reverse("main:home"))
 
-    user = request.user
+    creator = request.user
     if request.method == "POST":
         form = AddProjectForm(request.POST)
         if form.is_valid():
             project = form.save(commit=False)
-            project.user = user
+            project.creator = creator
             project.save()
             return redirect(reverse("core:myprojects"))
 
@@ -63,6 +80,15 @@ def deleteproject(request, project_id):
     return render(request, "core/deleteproject.html", {
         "project":project
     })
+
+def joinproject(request, invite_link):
+    if not request.user.is_authenticated:
+        return redirect(reverse("account:login"))
+    
+    project = get_object_or_404(Project, invite_link=invite_link)
+    user = request.user
+    project.addUser(user)
+    return redirect('core:project', project_id=project.id)
 
 def addtask(request, project_id):
     if not request.user.is_authenticated:
@@ -123,4 +149,43 @@ def deletetask(request, project_id, task_id):
     return render(request, "core/deletetask.html", {
         "project":project,
         "task":task
+    })
+
+def bulk_modify_permission(request, project_id):
+    if not request.user.is_authenticated:
+        return redirect(reverse("main:home"))
+
+    project = get_object_or_404(Project, id=project_id)
+    project_permission = ProjectPermission.objects.filter(project=project, user=request.user).first()
+    users = project.users.all()
+
+    if request.method == "POST":
+        form = BulkModifyPermissionForm(request.POST, project=project, request=request)
+
+        if form.is_valid():
+            new_permission = form.cleaned_data['new_permission']
+            selected_users = form.cleaned_data['selected_users']
+
+            for user_id in selected_users:
+                user = User.objects.get(id=user_id)
+                project.updatePermission(user, new_permission)
+
+            messages.success(request, "Permissions updated successfully.")
+            return redirect('core:project', project_id=project.id)
+    else:
+        form = BulkModifyPermissionForm(project=project, request=request)
+
+    user_has_modify_other_users_permissions = False
+    user_has_delete_project_permission = False
+    project_permission = ProjectPermission.objects.filter(project=project, user=request.user).first()
+    if project_permission:
+        user_has_modify_other_users_permissions = project_permission.has_permission('modify_other_users_permissions')
+        user_has_delete_project_permission = project_permission.has_permission('delete_project')
+
+    return render(request, "core/usermanagement.html", {
+        "project": project,
+        "users": users,
+        "form": form,
+        "user_has_modify_other_users_permissions": user_has_modify_other_users_permissions,
+        "user_has_delete_project_permission": user_has_delete_project_permission
     })

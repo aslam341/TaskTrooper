@@ -12,6 +12,14 @@ class RegisterForm(UserCreationForm):
     class Meta:
         model = User
         fields = ("username", "email", "first_name", "last_name", "password1", "password2")
+        widgets = {
+            'username': forms.TextInput(attrs={'autocomplete': 'off'}),
+            'email': forms.Textarea(attrs={'autocomplete': 'off'}),
+            'first_name': forms.DateTimeInput(attrs={'autocomplete': 'off'}),
+            'last_name': forms.DateTimeInput(attrs={'autocomplete': 'off'}),
+            'password1': forms.Select(attrs={'autocomplete': 'off'}),
+            'password2': forms.Select(attrs={'autocomplete': 'off'}),
+        }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

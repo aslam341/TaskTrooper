@@ -1,11 +1,54 @@
 from django import forms
-from .models import Project, Task
+from bootstrap_datepicker_plus.widgets import DateTimePickerInput
+from .models import Project, Task, ProjectPermission
+from django.contrib.auth.models import User
+from django.db.models import Q, F
 
+
+class BulkModifyPermissionForm(forms.Form):
+    selected_users = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple)
+    new_permission = forms.ChoiceField(choices=ProjectPermission.PERMISSION_CHOICES)
+
+    def __init__(self, *args, **kwargs):
+        project = kwargs.pop('project')
+        request = kwargs.pop('request')
+        super().__init__(*args, **kwargs)
+
+        current_user_permission = ProjectPermission.objects.filter(
+            project=project,
+            user=request.user
+        ).first().permission
+        print(current_user_permission)  
+
+        users = project.users.exclude(
+            id=request.user.id
+        ).exclude(
+            id=project.creator.id
+        )
+
+        filtered_users = []
+        for user in users:
+            user_permission = ProjectPermission.PERMISSION_LEVELS.get(
+                project.permissions.filter(user=user).first().permission
+            )
+            if user_permission is not None and user_permission < ProjectPermission.PERMISSION_LEVELS.get(current_user_permission):
+                filtered_users.append((user.id, user.username))
+
+        self.fields['selected_users'].choices = filtered_users
+
+        permission_choices = [
+            (key, value) for key, value in ProjectPermission.PERMISSION_CHOICES
+            if key != 'creator'
+        ]
+        self.fields['new_permission'].choices = permission_choices
 
 class AddProjectForm(forms.ModelForm):
     class Meta:
         model = Project
-        fields = '__all__'
+        fields = ['name']
+        widgets = {
+            'name': forms.TextInput(attrs={'autocomplete': 'off'}),
+        }
 
 class AddTaskForm(forms.ModelForm):
     def __init__(self, project_id, *args, **kwargs):
@@ -17,11 +60,57 @@ class AddTaskForm(forms.ModelForm):
     class Meta:
         model = Task
         fields = '__all__'
+        widgets = {
+            'name': forms.TextInput(attrs={'class': 'form-control', 'autocomplete': 'off'}),
+            'description': forms.Textarea(attrs={'class': 'form-control', 'autocomplete': 'off'}),
+            'start_datetime': DateTimePickerInput(
+                options={
+                    "format": "DD-MM-YYYY HH:mm",
+                    "useCurrent": False,
+                    "showClose": True,
+                    "showClear": True,
+                    "showTodayButton": True,
+                    "allowInputToggle": True,
+                },
+                attrs={
+                    'class': 'datepicker form-control',
+                    'autocomplete': 'off'
+                },
+            ),
+            'end_datetime': DateTimePickerInput(
+                range_from="start_datetime",
+                options={
+                    "format": "DD-MM-YYYY HH:mm",
+                    "useCurrent": False,
+                    "showClose": True,
+                    "showClear": True,
+                    "showTodayButton": True,
+                    "allowInputToggle": True,
+                },
+                attrs={
+                    'class': 'datepicker form-control',
+                    'autocomplete': 'off'
+                },
+            ),
+            'status': forms.Select(attrs={'class': 'form-control', 'autocomplete': 'off'}),
+        }
 
 class ChangeTaskStatusForm(forms.ModelForm):
     class Meta:
         model = Task
         fields = ['status']
         widgets = {
-            'status': forms.Select(attrs={'class': 'form-control'}),
+            'status': forms.Select(attrs={'class': 'form-control', 'autocomplete': 'off'}),
+        }
+
+class ModifyTaskForm(forms.ModelForm):
+    class Meta:
+        model = Task
+        exclude = ['project']
+        widgets = {
+            'name': forms.TextInput(attrs={'class': 'form-control', 'autocomplete': 'off'}),
+            'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 4}),
+            'start_datetime': forms.DateTimeInput(attrs={'class': 'form-control', 'autocomplete': 'off'}),
+            'end_datetime': forms.DateTimeInput(attrs={'class': 'form-control', 'autocomplete': 'off'}),
+            'status': forms.Select(attrs={'class': 'form-control', 'autocomplete': 'off'}),
         }

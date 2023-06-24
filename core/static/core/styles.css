@@ -1,0 +1,17 @@
+.sidebar {
+    background-color: #080d2b;
+    padding: 20px;
+    padding-top: 150px;
+    height: 100vh;
+    width: 200px;
+    position: fixed;
+    top: 0;
+    left: 0;
+}
+
+.sidebar a {
+    display: block;
+    margin-bottom: 10px;
+    color: #c58908;
+    text-decoration: none;
+}
