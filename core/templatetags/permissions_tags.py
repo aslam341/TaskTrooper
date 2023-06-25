@@ -15,3 +15,17 @@ def has_permission(user, permission, project_id):
         return project_permission.has_permission(permission)
 
     return False
+
+@register.simple_tag
+def get_project_permission(user, project):
+    project_permission = user.project_permissions.filter(project_id=project.id).first()
+    if project_permission:
+        return project_permission.get_permission_display()
+    return "No permission found"
+
+@register.simple_tag
+def get_project_permission_level(user, project):
+    project_permission = user.project_permissions.filter(project_id=project.id).first()
+    if project_permission:
+        return project_permission.permission_level
+    return "N/A"

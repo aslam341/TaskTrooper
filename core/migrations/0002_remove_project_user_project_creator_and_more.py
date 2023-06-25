@@ -24,7 +24,7 @@ class Migration(migrations.Migration):
         ),
         migrations.AddField(
             model_name='project',
-            name='invite_link',
+            name='invite_code',
             field=models.CharField(blank=True, max_length=7, null=True),
         ),
         migrations.AddField(

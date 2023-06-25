@@ -37,7 +37,7 @@
     </div>
   </section>
 
-  <section class="bg-dark-blue-2 text-light text-center p-5 p-lg-0 pt-lg-5">
+  <section class="bg-dark-blue-2 text-light text-center p-5 p-lg-0 pt-lg-5 ">
     <div class="container">
         <table class="table text-light" data-toggle="table">
           {% if users %}
@@ -51,26 +51,24 @@
             </thead>
             <tbody>
               {% for user in users %}
+                {% get_project_permission user project as project_permission %}
+                {% get_project_permission_level user project as project_permission_level %}
                 <tr>
                   <td>{{ forloop.counter }}</td>
                   <td>{{ user.username }}</td>
                   <td>
-                    {% with project_permission=user.project_permissions.first %}
-                      {% if project_permission %}
-                        {{ project_permission.get_permission_display }}
-                      {% else %}
-                        No permission found
-                      {% endif %}
-                    {% endwith %}
+                    {% if project_permission %}
+                      {{ project_permission }}
+                    {% else %}
+                      No permission found
+                    {% endif %}
                   </td>
                   <td>
-                    {% with project_permission=user.project_permissions.first %}
-                      {% if project_permission %}
-                        {{ project_permission.permission_level }}
-                      {% else %}
-                        N/A
-                      {% endif %}
-                    {% endwith %}
+                    {% if project_permission_level %}
+                      {{ project_permission_level }}
+                    {% else %}
+                      2
+                    {% endif %}
                   </td>
                 </tr>
               {% endfor %}
