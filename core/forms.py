@@ -2,6 +2,7 @@ from django import forms
 from bootstrap_datepicker_plus.widgets import DateTimePickerInput
 from .models import Project, Task, ProjectPermission
 from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
 from django.db.models import Q, F
 
 
@@ -86,6 +87,14 @@ class AddTaskForm(forms.ModelForm):
         self.fields['project'].initial = project_id
         self.fields['project'].disabled = True
         self.fields['users'].queryset = project.users.all()
+
+    def clean(self):
+        cleaned_data = super().clean()
+        start_datetime = cleaned_data.get('start_datetime')
+        end_datetime = cleaned_data.get('end_datetime')
+
+        if start_datetime and end_datetime and start_datetime >= end_datetime:
+            raise ValidationError("Start datetime must be before the end datetime.")
 
     class Meta:
         model = Task

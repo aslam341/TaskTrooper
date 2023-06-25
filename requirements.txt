@@ -1,6 +1,9 @@
 asgiref==3.6.0
 crispy-bootstrap5==0.7
 Django==4.2.1
+django-bootstrap-datepicker-plus==5.0.3
 django-crispy-forms==2.0
+pydantic==1.10.9
 sqlparse==0.4.4
+typing_extensions==4.6.3
 tzdata==2023.3
