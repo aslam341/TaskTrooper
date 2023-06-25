@@ -15,3 +15,15 @@
     color: #c58908;
     text-decoration: none;
 }
+
+.status-not-started {
+    background-color: red !important;
+  }
+  
+  .status-in-process {
+    background-color: orange !important;
+  }
+  
+  .status-completed {
+    background-color: green !important;
+  }

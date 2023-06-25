@@ -84,15 +84,17 @@
       </div>
   </section>
 
-  <section class="bg-dark-blue-2 text-light text-center p-5 p-lg-0 pt-lg-5" style="height: 100vh;">
-    <div class="container pb-3">
-      <h1>Bulk Remove Users</h1>
-      <form method="post">
-        {% csrf_token %}
-        {{ form_delete_users.as_table }}
-        <button type="submit" class="btn btn-danger btn-sm">Remove Users</button>
-      </form>
-    </div>
-  </section>
+  {% if user_has_delete_users_permission %}
+    <section class="bg-dark-blue-2 text-light text-center p-5 p-lg-0 pt-lg-5" style="height: 100vh;">
+      <div class="container pb-3">
+        <h1>Bulk Remove Users</h1>
+        <form method="post">
+          {% csrf_token %}
+          {{ form_delete_users.as_table }}
+          <button type="submit" class="btn btn-danger btn-sm">Remove Users</button>
+        </form>
+      </div>
+    </section>
+  {% endif %}
   
 {% endblock %}

@@ -134,12 +134,12 @@ def modifytask(request, project_id, task_id):
     project = task.project
 
     if request.method == "POST":
-        form = ModifyTaskForm(request.POST, instance=task)
+        form = ModifyTaskForm(request.POST, instance=task, project=project)
         if form.is_valid():
             form.save()
             return redirect(reverse("core:project", args=(project_id,)))
     else:
-        form = ModifyTaskForm(instance=task)
+        form = ModifyTaskForm(instance=task, project=project)
 
     return render(request, 'core/modifytask.html', {
         'form': form,

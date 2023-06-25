@@ -69,7 +69,9 @@
               <th data-sortable="true" scope="col">Start Date & Time</th>
               <th data-sortable="true" scope="col">End Date & Time</th>
               <th data-sortable="true" scope="col">Status</th>
-              <th scope="col">Actions</th>
+              {% if user_has_modify_tasks_permission %}
+                <th scope="col">Actions</th>
+              {% endif %}
             </tr>
           </thead>
           <tbody>
@@ -84,12 +86,18 @@
                 </td>
                 <td>{{ task.start_datetime }}</td>
                 <td>{{ task.end_datetime }}</td>
-                <td>{{ task.status }}</td>
-                <td>
-                  <a href="{% url 'core:deletetask' project.id task.id %}" class="nav-link p-1"><span class="btn btn-danger btn-sm">Delete</span></a>
-                  <a href="{% url 'core:changetaskstatus' project.id task.id %}" class="nav-link p-1"><span class="btn btn-info btn-sm">Change Status</span></a>
-                  <a href="{% url 'core:modifytask' project.id task.id %}" class="nav-link p-1"><span class="btn btn-info btn-sm">Modify Task</span></a>
-                </td>
+                <td class="{% if task.status == 'Not yet started' %}status-not-started{% elif task.status == 'In-process' %}status-in-process{% elif task.status == 'Completed' %}status-completed{% endif %}">{{ task.status }}</td>
+                {% if user_has_modify_tasks_permission %}
+                  <td>
+                    {% if user_has_delete_tasks_permission %}
+                      <a href="{% url 'core:deletetask' project.id task.id %}" class="nav-link p-1"><span class="btn btn-danger btn-sm">Delete</span></a>
+                    {% endif %}
+                    {% if user_has_modify_tasks_permission %}
+                      <a href="{% url 'core:changetaskstatus' project.id task.id %}" class="nav-link p-1"><span class="btn btn-info btn-sm">Change Status</span></a>
+                      <a href="{% url 'core:modifytask' project.id task.id %}" class="nav-link p-1"><span class="btn btn-info btn-sm">Modify Task</span></a>
+                    {% endif %}
+                  </td>
+                {% endif %}
               </tr>
             {% endfor %}
           </tbody>
@@ -100,20 +108,24 @@
         {% endif %}
       </table>
     </div>
-    <div class="pt-5">
-      <a href="{% url 'core:addtask' project.id %}" class="btn btn-success btn-lg">
-        <span class="fw-bold">
-          + Add Task
-        </span>
-      </a>
-    </div>
-    <form>
-      <div class="form-group pt-5">
-          <label for="invite_code">Invite Code:</label>
-          <input type="text" id="invite_code" name="invite_code" value="{{ project.invite_code }}" readonly>
+    {% if user_has_create_tasks_permission %}
+      <div class="pt-5">
+        <a href="{% url 'core:addtask' project.id %}" class="btn btn-success btn-lg">
+          <span class="fw-bold">
+            + Add Task
+          </span>
+        </a>
       </div>
-      <button type="submit" class="btn btn-info btn-sm" onclick="copyInviteLink()">Copy Invite Link</button>
-    </form>
+    {% endif %}
+    {% if user_has_add_users_permission %}
+      <form>
+        <div class="form-group pt-5 pb-3">
+            <label for="invite_code">Invite Code:</label>
+            <input type="text" id="invite_code" name="invite_code" value="{{ project.invite_code }}" readonly>
+        </div>
+        <button type="submit" class="btn btn-info btn-sm" onclick="copyInviteLink()">Copy Invite Link</button>
+      </form>
+    {% endif %}
 
   </section>
 {% endblock %}

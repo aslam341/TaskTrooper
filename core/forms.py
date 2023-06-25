@@ -37,7 +37,7 @@ class BulkModifyPermissionForm(forms.Form):
 
         permission_choices = [
             (key, value) for key, value in ProjectPermission.PERMISSION_CHOICES
-            if key != 'creator'
+            if key != 'creator' and ProjectPermission.PERMISSION_LEVELS.get(key) <= ProjectPermission.PERMISSION_LEVELS.get(current_user_permission)
         ]
         self.fields['new_permission'].choices = permission_choices
 
@@ -135,6 +135,13 @@ class ChangeTaskStatusForm(forms.ModelForm):
         }
 
 class ModifyTaskForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        project = kwargs.pop('project')  # Remove 'project' from kwargs
+        super().__init__(*args, **kwargs)
+        
+        # Restrict choices for 'users' field to project users
+        self.fields['users'].queryset = project.users.all()
+        
     class Meta:
         model = Task
         fields = ['name', 'description', 'start_datetime', 'end_datetime', 'status', 'users']
