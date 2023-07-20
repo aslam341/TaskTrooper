@@ -27,7 +27,7 @@
               <span class="text-warning">Hi, {{ user.first_name }}!</span>
             </li>
             <li class="nav-item">
-              <a href="{% url 'logout' %}" class="nav-link"><span class="btn btn-primary btn-sm">Logout</span></a>
+              <a href="{% url 'account_logout' %}" class="nav-link"><span class="btn btn-primary btn-sm">Logout</span></a>
             </li>
           </ul>
         {% else %}
@@ -39,10 +39,10 @@
               <a href="#contactus" class="nav-link">Contact Us</a>
             </li>
             <li class="nav-item">
-              <a href="{% url 'account:signup' %}" class="nav-link">Sign Up</a>
+              <a href="{% url 'account_signup' %}" class="nav-link">Sign Up</a>
             </li>
             <li class="nav-item">
-              <a href="{% url 'login' %}" class="nav-link"><span class="btn btn-primary btn-sm">Login</span></a>
+              <a href="{% url 'account_login' %}" class="nav-link"><span class="btn btn-primary btn-sm">Login</span></a>
             </li>
           </ul>
         {% endif %}
@@ -62,7 +62,7 @@
           <p class="lead">
             A simple project management app
           </p>
-          <a href="{% url 'account:signup' %}">
+          <a href="{% url 'account_signup' %}">
             {% if not user.is_authenticated %}
               <button class="btn btn-primary btn-lg">
                 Sign Up Now!

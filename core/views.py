@@ -74,7 +74,7 @@ def deleteproject(request, project_id):
 
 def joinproject(request, invite_code):
     if not request.user.is_authenticated:
-        return redirect(reverse("account:login"))
+        return redirect(reverse("account_login"))
     
     project = get_object_or_404(Project, invite_code=invite_code)
     user = request.user

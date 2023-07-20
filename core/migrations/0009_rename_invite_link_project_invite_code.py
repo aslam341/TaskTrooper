@@ -12,7 +12,8 @@ class Migration(migrations.Migration):
     operations = [
         migrations.RenameField(
             model_name='project',
-            old_name='invite_link',
+            # old_name='invite_link' used to be the old name of the field, but it was renamed to 'invite_code' due to migration errors
+            old_name='invite_code',
             new_name='invite_code',
         ),
     ]
