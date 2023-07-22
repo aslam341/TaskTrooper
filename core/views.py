@@ -2,10 +2,12 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
 from django.contrib import messages
 from django.contrib.auth.models import User
-from django.db.models import Q, F
+from django.db import transaction
+from django.http import HttpResponseRedirect
+import os
 
-from .models import Project, Task, ProjectPermission
-from .forms import AddTaskForm, AddProjectForm, ChangeTaskStatusForm, BulkModifyPermissionForm, BulkRemoveUserForm, ModifyTaskForm
+from .models import Project, Task, ProjectPermission, UserProfile, File
+from .forms import AddTaskForm, AddProjectForm, ChangeTaskStatusForm, BulkModifyPermissionForm, BulkRemoveUserForm, ModifyTaskForm, UserProfileForm
 
 # Create your views here.
 def index(request):
@@ -81,24 +83,74 @@ def joinproject(request, invite_code):
     project.addUser(user)
     return redirect('core:project', project_id=project.id)
 
+def edit_user_profile(request, project_id):
+    if not request.user.is_authenticated:
+        return redirect(reverse("account_login"))
+    
+    project = Project.objects.get(id=project_id)
+    user_profile = get_object_or_404(UserProfile, user=request.user, project_id=project_id)
+
+    if request.method == 'POST':
+        form = UserProfileForm(request.POST, instance=user_profile)
+        if form.is_valid():
+            form.save()
+            return redirect('core:project', project_id=project_id)
+    else:
+        form = UserProfileForm(instance=user_profile)
+
+    context = {
+        'form': form,
+        'user_profile': user_profile,
+        "project": project,
+    }
+
+    return render(request, 'core/edit_user_profile.html', context)
+
+def allusers(request, project_id):
+    if not request.user.is_authenticated:
+        return redirect(reverse("main:home"))
+
+    project = Project.objects.get(id=project_id)
+    users = project.users.all()
+
+    return render(request, "core/allusers.html", {
+        "project": project,
+        "users": users,
+    })
+
 def addtask(request, project_id):
     if not request.user.is_authenticated:
         return redirect(reverse("main:home"))
 
     project = Project.objects.get(id=project_id)
     if request.method == "POST":
-        form = AddTaskForm(project_id, request.POST)
+        form = AddTaskForm(project_id, request.POST, request.FILES)  # Include request.FILES for file uploads
         if form.is_valid():
-            task = form.save()
+            task = form.save(commit=False)
+            task.project = project
             task.save()
+
+            # Associate selected users with the task
+            selected_users = form.cleaned_data['users']
+            task.users.set(selected_users)
+
+            # Handle multiple files
+            new_files = request.FILES.getlist('new_files')
+            for uploaded_file in new_files:
+                file_instance = File(file=uploaded_file, project=project, task=task)
+                file_instance.save()
+
+            # Save the task with associated users and files
+            form.save_m2m()
+
             return redirect(reverse("core:project", args=(project.id,)))
 
     else:
         form = AddTaskForm(project_id)
 
     return render(request, "core/addtask.html", {
-        "form":form,
-        "project":project
+        "form": form,
+        "project": project
     })
 
 def taskproperties(request, project_id, task_id):
@@ -134,9 +186,25 @@ def modifytask(request, project_id, task_id):
     project = task.project
 
     if request.method == "POST":
-        form = ModifyTaskForm(request.POST, instance=task, project=project)
+        form = ModifyTaskForm(request.POST, request.FILES, instance=task, project=project)
         if form.is_valid():
-            form.save()
+            task = form.save()
+            
+            files_to_delete = form.cleaned_data['files_to_delete']
+
+            if files_to_delete:
+                # return render(request, 'core/confirm_file_deletion.html', {
+                #     'files_to_delete': files_to_delete,
+                #     'project': project
+                # })
+                for file in files_to_delete:
+                    file.delete()
+                return redirect(reverse("core:project", args=(project_id,)))
+
+            files = request.FILES.getlist('new_files')
+            for file in files:
+                File.objects.create(task=task, file=file)
+
             return redirect(reverse("core:project", args=(project_id,)))
     else:
         form = ModifyTaskForm(instance=task, project=project)
@@ -146,7 +214,6 @@ def modifytask(request, project_id, task_id):
         'project': project,
         'task': task
     })
-    
 
 def deletetask(request, project_id, task_id):
     if not request.user.is_authenticated:

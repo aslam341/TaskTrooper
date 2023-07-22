@@ -1,0 +1,86 @@
+{% extends "main/layout.html" %}
+{% load permissions_tags %}
+{% load static %}
+
+{% block title %}
+  {{ project.name }} 
+{% endblock %}
+
+{% block head %}
+  <link rel="stylesheet" type="text/css" href="{% static 'core/styles.css' %}">
+{% endblock %}
+
+{% block body %}
+
+  <!-- Loads and stores the permissions the user has -->
+  {% has_permission user "read" project.id as user_has_read_permission %}
+  {% has_permission user "add_users" project.id as user_has_add_users_permission %}
+  {% has_permission user "create_tasks" project.id as user_has_create_tasks_permission %}
+  {% has_permission user "modify_tasks" project.id as user_has_modify_tasks_permission %}
+  {% has_permission user "delete_tasks" project.id as user_has_delete_tasks_permission %}
+  {% has_permission user "modify_other_users_permissions" project.id as user_has_modify_other_users_permissions %}
+  {% has_permission user "delete_users" project.id as user_has_delete_users_permission %}
+  {% has_permission user "delete_project" project.id as user_has_delete_project_permission %}
+  {% has_permission user "creator" project.id as user_has_creator_permission %}
+
+  {% include "core/navbarlayout.html" %}
+  {% include "core/sidebarlayout.html" with user_has_modify_other_users_permissions=user_has_modify_other_users_permissions user_has_delete_project_permission=user_has_delete_project_permission %}
+
+  <section class="bg-dark-blue-2 text-light text-center p-5 p-lg-0 pt-lg-5" style="min-height: 100vh; display: flex; align-items: top;">
+    <div class="container">
+        <table class="table text-light" data-toggle="table">
+          {% if users %}
+          <thead>
+            <tr>
+              <th scope="col">id</th>
+              <th scope="col">Username</th>
+              <th data-sortable="true" scope="col">Permission</th>
+              <th data-sortable="true" scope="col">Permission Level</th>
+              <th scope="col">Display Name</th>
+              <th scope="col">Role</th>
+              <th scope="col">Phone Number</th>
+              <th scope="col">Email Address</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for user in users %}
+              <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ user.username }}</td>
+                <td>
+                  {% get_project_permission user project as project_permission %}
+                  {{ project_permission }}
+                </td>
+                <td>
+                  {% get_project_permission_level user project as project_permission_level %}
+                  {{ project_permission_level }}
+                </td>
+                <td>
+                  {% get_user_profile user project as user_profile %}
+                  {{ user_profile.display_name|default:"-" }}
+                </td>
+                <td>
+                  {% get_user_profile user project as user_profile %}
+                  {{ user_profile.role|default:"-" }}
+                </td>
+                <td>
+                  {% get_user_profile user project as user_profile %}
+                  {{ user_profile.phone_number|default:"-" }}
+                </td>
+                <td>
+                  {% get_user_profile user project as user_profile %}
+                  {{ user_profile.email_address|default:"-" }}
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+          {% else %}
+            <tr>
+              <td colspan="6">No users found.</td>
+            </tr>
+          {% endif %}
+        </table>
+      </div>
+  </section>
+  
+{% endblock %}

@@ -29,3 +29,10 @@ def get_project_permission_level(user, project):
     if project_permission:
         return project_permission.permission_level
     return "N/A"
+
+@register.simple_tag
+def get_user_profile(user, project):
+    user_profile = user.profiles.filter(project_id=project.id).first()
+    if user_profile:
+        return user_profile
+    return "N/A"

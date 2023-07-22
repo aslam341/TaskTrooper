@@ -1,0 +1,21 @@
+{% extends "main/layout.html" %}
+
+{% block body %}
+<section class="bg-dark-blue-2 text-light text-center text-sm-start p-5 p-lg-0 pt-lg-5" style="height: 100vh;">
+  <div class="container pb-3">
+      <h1>Confirm Deletion</h1>
+      <h2>Files to be deleted:</h2>
+      <ul>
+          {% for file in files_to_delete %}
+              <li>{{ file.file.name }}</li>
+          {% endfor %}
+      </ul>
+      <form method="post">
+          {% csrf_token %}
+          <input type="hidden" name="confirm_delete_files" value="true">
+          <button type="submit" class="btn btn-primary">Confirm Deletion</button>
+          <a href="{% url 'core:modifytask' project.id task.id %}" class="btn btn-secondary">Cancel</a>
+      </form>
+  </div>
+</section>
+{% endblock %}

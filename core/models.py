@@ -1,6 +1,8 @@
 from django.db import models, IntegrityError, transaction
 from django.contrib.auth.models import User
 import uuid
+from phonenumber_field.modelfields import PhoneNumberField
+import os
 
 # Create your models here.
 
@@ -26,6 +28,9 @@ class Project(models.Model):
             if not created:
                 project_permission.permission = 'read'
                 project_permission.save()
+                
+            # Create a user profile for the user in this project
+            UserProfile.objects.create(user=user, project=self)
 
     def removeUser(self, user):
         self.users.remove(user)
@@ -50,6 +55,7 @@ class Project(models.Model):
                 user=self.creator,
                 permission='creator'
             )
+            UserProfile.objects.create(user=self.creator, project=self)
         else:
             super().save(*args, **kwargs)
 
@@ -97,6 +103,16 @@ class ProjectPermission(models.Model):
         return self.PERMISSION_LEVELS.get(self.permission, 0)
 
     
+class UserProfile(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="profiles")
+    project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name="user_profiles")
+    display_name = models.CharField(max_length=100, blank=True, null=True)
+    role = models.CharField(max_length=100, blank=True, null=True)
+    phone_number = PhoneNumberField(max_length=20, blank=True, null=True)
+    email_address = models.EmailField(blank=True, null=True)
+
+    def __str__(self):
+        return f"Profile for {self.user.username} in {self.project.name}"
     
 class Task(models.Model):
     STATUS_CHOICES = (
@@ -120,3 +136,12 @@ class Task(models.Model):
 
     def __str__(self):
         return f"{self.name}"
+    
+class File(models.Model):
+    project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name='project_files', null=True, blank=True)
+    task = models.ForeignKey(Task, on_delete=models.CASCADE, related_name='task_files', null=True, blank=True)
+    file = models.FileField(upload_to='files/')
+
+    def __str__(self):
+        return self.file.name
+    

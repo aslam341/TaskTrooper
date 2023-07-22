@@ -5,7 +5,7 @@
 {% load static %}
 
 {% block title %}
-  {{ project.name }} 
+  {{ project.name }}
 {% endblock %}
 
 {% block head %}
@@ -15,7 +15,7 @@
 {% load crispy_forms_tags %}
 
 {% block body %}
-
+  
   <!-- Loads and stores the permissions the user has -->
   {% has_permission user "read" project.id as user_has_read_permission %}
   {% has_permission user "add_users" project.id as user_has_add_users_permission %}
@@ -30,15 +30,13 @@
   {% include "core/navbarlayout.html" %}
   {% include "core/sidebarlayout.html" with user_has_modify_other_users_permissions=user_has_modify_other_users_permissions user_has_delete_project_permission=user_has_delete_project_permission %}
 
-  <section class="bg-dark-blue-2 text-light text-center text-sm-start p-5 p-lg-0 pt-lg-5" style="min-height: 100vh; display: flex; align-items: center;">
-    <div class="container pb-3">
-      <h1>Modify Task</h1>
-      <form method="post" enctype="multipart/form-data">
+  <section class="bg-dark-blue-2 text-light text-center text-sm-start p-5 p-lg-0 pt-lg-5" style="height: 100vh;">
+    <div class="container py-5">
+      <form method="post">
         {% csrf_token %}
         {{ form.media }}
         {{ form | crispy }}
-
-        <button type="submit" class="btn btn-primary">Save Changes</button>
+        <button type="submit" class="btn btn-success">Save</button>
       </form>
     </div>
   </section>

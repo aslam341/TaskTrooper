@@ -26,7 +26,7 @@
   {% include "core/navbarlayout.html" %}
   {% include "core/sidebarlayout.html" with user_has_modify_other_users_permissions=user_has_modify_other_users_permissions user_has_delete_project_permission=user_has_delete_project_permission %}
 
-  <section class="bg-dark-blue-2 text-light text-center p-5 p-lg-0 pt-lg-5">
+  <section class="bg-dark-blue-2 text-light text-center p-5 p-lg-0 pt-lg-5" style="display: flex; align-items: center;">
     <div class="container pb-3">
       <h1>Bulk Modify Permission</h1>
       <form method="post">
@@ -37,7 +37,7 @@
     </div>
   </section>
 
-  <section class="bg-dark-blue-2 text-light text-center p-5 p-lg-0 pt-lg-5 ">
+  <section class="bg-dark-blue-2 text-light text-center p-5 p-lg-0 pt-lg-5" style="{% if not user_has_delete_users_permission %} min-height: 100vh; {% endif %} display: flex; align-items: top;">
     <div class="container">
         <table class="table text-light" data-toggle="table">
           {% if users %}
@@ -67,7 +67,7 @@
                     {% if project_permission_level %}
                       {{ project_permission_level }}
                     {% else %}
-                      2
+                      N/A
                     {% endif %}
                   </td>
                 </tr>
@@ -83,7 +83,7 @@
   </section>
 
   {% if user_has_delete_users_permission %}
-    <section class="bg-dark-blue-2 text-light text-center p-5 p-lg-0 pt-lg-5" style="height: 100vh;">
+    <section class="bg-dark-blue-2 text-light text-center p-5 p-lg-0 pt-lg-5" style="min-height: 100vh; display: flex; align-items: top;">
       <div class="container pb-3">
         <h1>Bulk Remove Users</h1>
         <form method="post">

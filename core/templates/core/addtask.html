@@ -30,9 +30,9 @@
   {% include "core/navbarlayout.html" %}
   {% include "core/sidebarlayout.html" with user_has_modify_other_users_permissions=user_has_modify_other_users_permissions user_has_delete_project_permission=user_has_delete_project_permission %}
 
-  <section class="bg-dark-blue-2 text-light text-center text-sm-start p-5 p-lg-0 pt-lg-5" style="height: 100vh;">
+  <section class="bg-dark-blue-2 text-light text-center text-sm-start p-5 p-lg-0 pt-lg-5" style="min-height: 100vh; display: flex; align-items: center;">
     <div class="container py-5">
-      <form method="post">
+      <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
         {{ form.media }}
         {{ form | crispy }}
