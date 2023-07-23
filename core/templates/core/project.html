@@ -51,7 +51,7 @@
   {% include "core/navbarlayout.html" %}
   {% include "core/sidebarlayout.html" with user_has_modify_other_users_permissions=user_has_modify_other_users_permissions user_has_delete_project_permission=user_has_delete_project_permission %}
 
-  <section class="bg-dark-blue-2 text-light text-center p-5 p-lg-0 pt-lg-5" style="height: 100vh;">
+  <section class="bg-dark-blue-2 text-light text-center p-5 p-lg-0 pt-lg-5" style="min-height: 100vh;">
     <div class="container pb-3">
         <h1 class="display-4 fw-bold">Project Name: {{ project.name }}</h1>
         <div class="text-start">
@@ -88,9 +88,13 @@
                 <td>{{ task.start_datetime }}</td>
                 <td>{{ task.end_datetime }}</td>
                 <td>
-                  {% for file in task.task_files.all %}
-                    <a href="{{ file.file.url }}" target="_blank">{{ file.file.name|cut:"files/" }}</a><br>
-                  {% endfor %}
+                  {% if not task.task_files.all %}
+                    -
+                  {% else %}
+                    {% for file in task.task_files.all %}
+                      <a href="{{ file.file.url }}" target="_blank">{{ file.file.name|cut:"files/" }}</a><br>
+                    {% endfor %}
+                  {% endif %}
                 </td>
                 <td class="{% if task.status == 'Not yet started' %}status-not-started{% elif task.status == 'In-process' %}status-in-process{% elif task.status == 'Completed' %}status-completed{% endif %}">{{ task.status }}</td>
                 {% if user_has_modify_tasks_permission %}

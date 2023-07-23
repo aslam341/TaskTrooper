@@ -12,18 +12,22 @@
     <section class="bg-dark-blue-2 text-light text-center text-sm-start p-5 p- pt-lg-5" style="height: 100vh;">
       <div class="container">
         <div class="align-items-center justify-content-between">
-          <p> Task Name: {{ task.name }}</p>
-          <p> Task Users: 
+          <p>Task Name: {{ task.name }}</p>
+          <p>Users: 
             {% for user in task.users.all %}
               {{ user.username }}
               {% if not forloop.last %},{% endif %}
             {% endfor %}
           </p>
-          <p> Task Description:</p>
+          <p>Description:</p>
           <p class="pb-5"> &nbsp;&nbsp;&nbsp;&nbsp; {{ task.description }}</p>
-          <p> Task Start Date and Time: {{ task.start_datetime }}</p>
-          <p> Task End Date and Time: {{ task.end_datetime }}</p>
-          <p> Task Status: {{ task.status }}</p>
+          <p>Start Date/Time: {{ task.start_datetime }}</p>
+          <p>End Date/Time: {{ task.end_datetime }}</p>
+          <p>Status: {{ task.status }}</p>
+          <p>Files: </p>
+            {% for file in task.task_files.all %}
+              <a href="{{ file.file.url }}" class="nav-link"> &nbsp;&nbsp;&nbsp;&nbsp; {{ file.file.name }}</a>
+            {% endfor %}
         </div>
       </div> 
     </section>
