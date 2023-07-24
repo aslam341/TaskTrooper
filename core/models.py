@@ -1,10 +1,8 @@
-from django.db import models, IntegrityError, transaction
+from django.db import models
 from django.contrib.auth.models import User
 import uuid
 from phonenumber_field.modelfields import PhoneNumberField
 import os
-
-# Create your models here.
 
 class Project(models.Model):
     name = models.CharField(max_length=100)
@@ -35,6 +33,8 @@ class Project(models.Model):
     def removeUser(self, user):
         self.users.remove(user)
         ProjectPermission.objects.filter(project=self, user=user).delete()
+        # Delete the associated UserProfile for the user in this project
+        UserProfile.objects.filter(user=user, project=self).delete()
 
     def updatePermission(self, user, new_permission):
         project_permission = ProjectPermission.objects.filter(project=self, user=user).first()
@@ -145,3 +145,11 @@ class File(models.Model):
     def __str__(self):
         return self.file.name
     
+    def delete(self, *args, **kwargs):
+        # Get the file path before deleting the model instance
+        file_path = self.file.path
+        super().delete(*args, **kwargs)
+        # Delete the associated file from the storage
+        if os.path.exists(file_path):
+            os.remove(file_path)
+
