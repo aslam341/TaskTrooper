@@ -112,8 +112,8 @@ class AddTaskForm(forms.ModelForm):
         start_datetime = cleaned_data.get('start_datetime')
         end_datetime = cleaned_data.get('end_datetime')
 
-        if start_datetime and end_datetime and start_datetime >= end_datetime:
-            raise ValidationError("Start datetime must be before the end datetime.")
+        if start_datetime and end_datetime and start_datetime > end_datetime:
+            raise ValidationError("Start datetime must be same as or before the end datetime.")
         
     def save(self, commit=True):
         instance = super().save(commit=commit)
