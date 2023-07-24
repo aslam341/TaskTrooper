@@ -9,7 +9,7 @@
 
 {% block content %}
 
-  <div class="row">
+  <div class="row bg-dark-blue-2 text-light pt-2 float">
     <h1 class="text-center">{% trans "Sign In" %}</h1>
     <div class="col-md-6 offset-md-3">
       <form class="login" method="POST" action="{% url 'account_login' %}">
@@ -18,14 +18,14 @@
           {% if redirect_field_value %}
           <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
           {% endif %}
-          <div class="d-grid">
+          <div class="d-grid pb-3">
             <button class="primaryAction mt-3 btn btn-dark" type="submit">{% trans "Sign In" %}</button><br>
-            <a class="button secondaryAction text-dark text-center" href="{% url 'account_reset_password' %}">{% trans "Forgot Password?" %}</a>
+            <a class="button secondaryAction text-light text-center" href="{% url 'account_reset_password' %}">{% trans "Forgot Password?" %}</a>
           </div>
         </form>
     </div>
   </div>
-  <div class="text-center">
+  <div class="text-center bg-dark-blue-2 text-light float" style="min-height: 100vh;">
     <div class="login-or border-top border-bottom my-3">{% trans 'OR' %}</div>
 
     {% get_providers as socialaccount_providers %}

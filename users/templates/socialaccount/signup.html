@@ -7,13 +7,13 @@
 {% block head_title %}{% trans "Signup" %}{% endblock %}
 
 {% block content %}
-<div class="text-center">
-    <h1>{% trans "Sign Up" %}</h1>
+<div class="text-center bg-dark-blue-2 text-light float pt-3" style="min-height: 100vh;">
+    <h1>{% trans "Social Sign In/Up Error" %}</h1>
 
-<p>{% blocktrans with provider_name=account.get_provider.name site_name=site.name %}You are about to use your {{provider_name}} account to login to
-TaskTrooper. As a final step, please complete the following form:{% endblocktrans %}</p>
+<p>{% blocktrans with provider_name=account.get_provider.name site_name=site.name %}You have not linked up your {{provider_name}} account to login to
+    TaskTrooper.<br> To login using {{provider_name}}, please sign-in using username/email and password, then go to "My Socials" and link your {{provider_name}} account.{% endblocktrans %}</p>
 </div>
-<div class="row">
+<!-- <div class="row">
     <div class="col-md-6 offset-md-3">
             <form class="signup" id="signup_form" method="post" action="{% url 'socialaccount_signup' %}">
             {% csrf_token %}
@@ -26,5 +26,5 @@ TaskTrooper. As a final step, please complete the following form:{% endblocktran
             </div>
         </form>
     </div>
-</div>
+</div> -->
 {% endblock %}
